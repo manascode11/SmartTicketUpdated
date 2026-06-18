@@ -1,0 +1,42 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* Custom utility tweaks for React Markdown formatting inside your DaisyUI wrapper */
+.prose h3 {
+  font-weight: 800;
+  color: var(--color-accent);
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+}
+
+.prose ul {
+  list-style-type: disc;
+  margin-left: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.prose li {
+  margin-bottom: 0.25rem;
+}
+
+.prose pre {
+  background-color: #111827;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-family: monospace;
+  overflow-x: auto;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.prose code {
+  color: #f43f5e;
+  font-family: monospace;
+  background-color: rgba(0,0,0,0.2);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+}
