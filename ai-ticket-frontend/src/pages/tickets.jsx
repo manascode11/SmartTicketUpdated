@@ -8,7 +8,6 @@ export default function Tickets() {
 
   const token = localStorage.getItem("token");
 
-  // 1. Fetches all existing incidents from database on mount
   const fetchTickets = async () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/tickets`, {
@@ -16,7 +15,8 @@ export default function Tickets() {
         method: "GET",
       });
       const data = await res.json();
-      setTickets(data.tickets || []);
+      // Safely handle if the backend returns the array directly or wrapped in an object
+      setTickets(Array.isArray(data) ? data : data.tickets || []);
     } catch (err) {
       console.error("Failed to fetch tickets:", err);
     }
@@ -30,7 +30,6 @@ export default function Tickets() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 2. Submits new incident and updates UI state instantly
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -47,14 +46,12 @@ export default function Tickets() {
       const data = await res.json();
 
       if (res.ok) {
-        // Clear out input values
         setForm({ title: "", description: "" });
         
-        // Append new ticket to the existing state array instantly
+        // If your backend responds with { ticket: ... }
         if (data.ticket) {
           setTickets((prevTickets) => [data.ticket, ...prevTickets]);
         } else {
-          // Re-fetch loop fallback if backend returns payload wrapping variations
           fetchTickets();
         }
       } else {
@@ -78,7 +75,6 @@ export default function Tickets() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-10">
-      {/* Ticket Creation Form Component Block */}
       <div className="card bg-base-100 border border-base-200 shadow-xl p-6">
         <h2 className="card-title text-xl font-bold border-b pb-2 mb-4 text-primary">➕ Create New Support Issue</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -104,7 +100,6 @@ export default function Tickets() {
         </form>
       </div>
 
-      {/* Grid Display Grid Layout for support queue ticket lists */}
       <div className="space-y-4">
         <h2 className="text-xl font-extrabold tracking-tight text-neutral-content">📋 System Incidents</h2>
         <div className="grid md:grid-cols-2 gap-4">
@@ -136,5 +131,5 @@ export default function Tickets() {
         )}
       </div>
     </div>
-  );
+  ); 
 }

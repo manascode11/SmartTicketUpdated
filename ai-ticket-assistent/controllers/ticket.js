@@ -5,27 +5,23 @@ import Ticket from "../models/ticket.js";
 // @route   POST /api/tickets
 export const createTicket = async (req, res) => {
   try {
-    const { title, description } = req.body;
+    const { title, description, aiModel } = req.body;
     if (!title || !description) {
-      return res
-        .status(400)
-        .json({ message: "Title and description are required" });
+      return res.status(400).json({ message: "Title and description are required" });
     }
 
     const newTicket = await Ticket.create({
       title,
       description,
+      aiModel: aiModel || "gemini-2.5-flash",
       createdBy: req.user._id.toString(),
     });
 
-    // Fire background process via Inngest
     await inngest.send({
       name: "ticket/created",
       data: {
         ticketId: newTicket._id.toString(),
-        title,
-        description,
-        createdBy: req.user._id.toString(),
+        aiModel: newTicket.aiModel,
       },
     });
 
@@ -47,12 +43,13 @@ export const getTickets = async (req, res) => {
     if (user.role !== "user") {
      
       tickets = await Ticket.find({})
-        .populate("assignedTo", ["email", "_id"])
+        .populate("assignedTo", ["email", "name", "_id"])
         .sort({ createdAt: -1 });
     } else {
-    
+
       tickets = await Ticket.find({ createdBy: user._id })
-        .select("title description status priority helpfulNotes relatedSkills createdAt")
+        .select("title description status priority helpfulNotes relatedSkills assignedTo deadline createdAt")
+        .populate("assignedTo", ["email", "name", "_id"])
         .sort({ createdAt: -1 });
     }
     return res.status(200).json(tickets);
@@ -68,16 +65,14 @@ export const getTicket = async (req, res) => {
     let ticket;
 
     if (user.role !== "user") {
-      // Admins and Moderators get full ticket document details
-      ticket = await Ticket.findById(req.params.id).populate("assignedTo", [
-        "email",
-        "_id",
-      ]);
+      ticket = await Ticket.findById(req.params.id).populate("assignedTo", ["email", "name", "_id"]);
     } else {
       ticket = await Ticket.findOne({
         createdBy: user._id,
         _id: req.params.id,
-      }).select("title description status priority helpfulNotes relatedSkills createdAt");
+      })
+      .select("title description status priority helpfulNotes relatedSkills assignedTo deadline createdAt")
+      .populate("assignedTo", ["email", "name", "_id"]);
     }
 
     if (!ticket) {

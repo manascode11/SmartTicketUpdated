@@ -4,7 +4,7 @@ export const sendMail = async (to, subject, text) => {
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.MAILTRAP_SMTP_HOST,
-      port: Number(process.env.MAILTRAP_SMTP_PORT),
+      port: Number(process.env.MAILTRAP_SMTP_PORT || 2525),
       secure: false,
       auth: {
         user: process.env.MAILTRAP_SMTP_USER,
@@ -19,10 +19,10 @@ export const sendMail = async (to, subject, text) => {
       text,
     });
 
-    console.log("Message sent:", info.messageId);
+    console.log("✉️ Message sent successfully:", info.messageId);
     return info;
   } catch (error) {
-    console.error(" Mail error:", error.message);
+    console.error("❌ Mail utility error:", error.message);
     throw error;
   }
 };

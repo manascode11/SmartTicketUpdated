@@ -50,9 +50,26 @@ export default function TicketDetailsPage() {
         </div>
 
         <div className="grid sm:grid-cols-3 gap-4 border-y border-base-200 py-4 text-sm">
-          <div><strong>Status Flag:</strong> <span className="badge badge-neutral uppercase tracking-wider font-bold ml-2">{ticket.status}</span></div>
-          <div><strong>Priority Level:</strong> <span className="badge badge-error uppercase font-black ml-2">{ticket.priority || "Triage In Progress"}</span></div>
-          <div><strong>Assigned Overseer:</strong> <span className="text-info font-medium ml-1">{ticket.assignedTo?.email || "Fallback Queue (Admin)"}</span></div>
+          <div>
+            <strong>Status Flag:</strong> 
+            <span className="badge badge-neutral uppercase tracking-wider font-bold ml-2">{ticket.status}</span>
+          </div>
+          <div>
+            <strong>Priority Level:</strong> 
+            <span className="badge badge-error uppercase font-black ml-2">{ticket.priority || "Triage In Progress"}</span>
+          </div>
+          
+          {/* UPDATED: Displays populated name/email or dynamic processing indicator */}
+          <div>
+            <strong>Assigned Overseer:</strong> 
+            <span className="text-info font-medium ml-2">
+              {ticket.assignedTo ? (
+                ticket.assignedTo.name || ticket.assignedTo.email
+              ) : (
+                <span className="text-gray-500 animate-pulse font-normal">Assigning Agent...</span>
+              )}
+            </span>
+          </div>
         </div>
 
         {ticket.relatedSkills?.length > 0 && (
